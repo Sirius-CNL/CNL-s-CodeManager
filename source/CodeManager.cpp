@@ -94,6 +94,28 @@ void start_problem(const wstring &name)
     _wsystem(command.c_str());
 }
 
+// 删除题目
+void delete_problem(const wstring& name) {
+    ensure_codes_dir_exists();
+    path codes_dir = get_codes_dir();
+    path file_path = codes_dir / (name + L".cpp");
+    
+    if (!exists(file_path)) {
+        wcerr << L"错误：题目 '" << name << L"' 不存在\n";
+        return;
+    }
+    
+    try {
+        if (remove(file_path)) {
+            wcout << L"题目 '" << name << L"' 已成功删除\n";
+        } else {
+            wcerr << L"错误：无法删除题目 '" << name << L"'\n";
+        }
+    } catch (const filesystem_error& e) {
+        wcerr << L"错误：删除题目时出错 - " << e.what() << L"\n";
+    }
+}
+
 // 显示帮助信息
 void show_help()
 {
@@ -139,6 +161,10 @@ int wmain(int argc, wchar_t *argv[])
     else if (command == L"start" && argc == 3)
     {
         start_problem(argv[2]);
+    }
+    else if (command == L"del" && argc == 3) 
+    {
+        delete_problem(argv[2]);
     }
     else if (command == L"help" && argc == 2)
     {

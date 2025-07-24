@@ -23,4 +23,6 @@
 * help  - 帮助
 * about - 关于
 
+注：这个程序会把文件复制，所以原文件被删除也不会有影响。
+
 关注我 (LEGENDrd)：[Bilibili](https://space.bilibili.com/3546767803026063?spm_id_from=333.1007.0.0)，[CSDN博客](https://blog.csdn.net/R_D_LEGEND?type=blog)
