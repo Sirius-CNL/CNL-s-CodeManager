@@ -119,9 +119,10 @@ void delete_problem(const wstring& name) {
 // 显示帮助信息
 void show_help()
 {
-    wcout << L"CodeManager (CM) 使用说明:\n"
+    wcout << L"\nCodeManager (CM) 使用说明:\n"
           << L"> CM add <题目名称> <源文件路径>  - 添加题目\n"
           << L"> CM list                         - 列出所有题目\n"
+          << L"> CM del                          - 删除题目\n"
           << L"> CM start <题目名称>             - 打开题目\n"
           << L"> CM help                         - 显示帮助\n"
           << L"   -------------by CNL 2025.7------------   \n";
