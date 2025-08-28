@@ -27,6 +27,7 @@ Code Manager 1.1
 #include <map>
 #include <windows.h>
 #include <cstdlib>
+#include <ctime>
 
 using namespace std;
 using namespace std::filesystem;
@@ -38,6 +39,26 @@ path get_codes_dir()
     GetModuleFileNameW(nullptr, exe_path, MAX_PATH);
     path exe_dir = path(exe_path).parent_path();
     return exe_dir / "codes";
+}
+
+wstring get_date()
+{
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    return to_wstring(1900 + ltm->tm_year) + L"_" + to_wstring(1 + ltm->tm_mon) + L"_" + to_wstring(ltm->tm_mday);
+}
+
+wstring get_time()
+{
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    return to_wstring(ltm->tm_hour) + L":" + to_wstring(ltm->tm_min) + L":" + to_wstring(ltm->tm_sec);
+}
+
+// 获取日志文件路径
+path get_logs_path()
+{
+    return get_codes_dir().parent_path() / L"logs" / (get_date() + L".log");
 }
 
 // 获取语言映射文件路径
@@ -59,6 +80,16 @@ void ensure_codes_dir_exists()
     if (!exists(codes_dir))
     {
         create_directory(codes_dir);
+    }
+}
+
+// 确保日志目录存在
+void ensure_logs_exists()
+{
+    path logs_path = get_logs_path();
+    if (!exists(logs_path))
+    {
+        create_directory(logs_path.parent_path());
     }
 }
 
@@ -152,7 +183,7 @@ void add_problem(const wstring &name, const wstring &source_path)
     ensure_codes_dir_exists();
     path codes_dir = get_codes_dir();
     path source_file_path(source_path);
-    wstring ext = source_file_path.extension();
+    wstring ext = source_file_path.extension(); // 拓展名
     path dest_path = codes_dir / (name + ext);
 
     if (exists(dest_path))
@@ -169,7 +200,9 @@ void add_problem(const wstring &name, const wstring &source_path)
         auto name_map = load_name_map();
         name_map[name] = (name + ext);
         save_name_map(name_map);
-        
+        ensure_logs_exists();
+        wofstream fout(get_logs_path(), ios::app);
+        fout << L'[' << get_time() << L"] + " << name + ext << '\n';
         wcout << L"题目 '" << name << L"' 添加成功\n";
     }
     catch (const filesystem_error &e)
@@ -296,6 +329,9 @@ void delete_problem(const wstring& name)
     try {
         if (remove(file_path)) {
             wcout << L"题目 '" << name << L"' 已成功删除\n";
+            ensure_logs_exists();
+            wofstream fout(get_logs_path(), ios::app);
+            fout << L'[' << get_time() << L"] - " << filename << '\n';
         } else {
             wcerr << L"错误：无法删除题目 '" << name << L"'\n";
         }
@@ -376,13 +412,13 @@ void show_help()
 
 void show_about()
 {
-    wcout << L"\n关于 CodeManager (CM) 1.0 \n"
+    wcout << L"\n关于 CodeManager (CM) 2.1 \n"
           << L"作者：CNL - LEGENDrd@163.com\n"
           << L"这是我自己做的一个小程序，可能会有一些bug。\n"
           << L"Gitee项目链接：https://gitee.com/legendrd/cnl\n"
           << L"Bug提交：https://gitee.com/legendrd/cnl/issues（我能改就会改的）\n"
           << L"关注 https://space.bilibili.com/3546767803026063?spm_id_from=333.1007.0.0\n"
-          << L"2025.7.24\n";
+          << L"2025.8.28\n";
 }
 
 int wmain(int argc, wchar_t *argv[])
